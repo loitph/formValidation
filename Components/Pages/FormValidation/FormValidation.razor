@@ -1,0 +1,167 @@
+@page "/"
+@page "/customerContactForm"
+
+@using System.ComponentModel.DataAnnotations
+
+
+<PageTitle>Customer Contact Form</PageTitle>
+
+<h1>Customer Contact Form</h1>
+
+<EditForm Model="contact" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+  <DataAnnotationsValidator />
+
+  <div class="d-flex flex-column gap-4">
+
+    @* Full name *@
+    <div class="form-group required">
+      <label for="fullname">Full name</label>
+      <input type="text" class="form-control" id="fullname" aria-describedby="full-name" placeholder="Enter full name" @bind:event="oninput" @bind="contact.FullName">
+
+      <small id="full-name" class="form-text text-muted">
+        <ValidationMessage For="@(() => contact.FullName)" />
+      </small>
+    </div>
+
+    @* Email *@
+    <div class="form-group required">
+      <label for="email">Email</label>
+      <input type="mail" class="form-control" id="email" aria-describedby="contact-email" placeholder="Enter email" @bind:event="oninput" @bind="contact.Email">
+
+      <small id="contact-email" class="form-text text-muted">
+        <ValidationMessage For="@(() => contact.Email)" />
+      </small>
+    </div>
+
+    @* Phone number *@
+    <div class="form-group required">
+      <label for="phone">Phone number</label>
+      <input type="number" class="form-control" id="phone" aria-describedby="phone-number" placeholder="Enter phone number" @bind:event="oninput" @bind="contact.Phone">
+
+      <small id="phone-number" class="form-text text-muted">
+        <ValidationMessage For="@(() => contact.Phone)" />
+      </small>
+    </div>
+
+    @* Address *@
+    <div class="form-group">
+      <label for="address">Address</label>
+      <input type="text" class="form-control" id="address" aria-describedby="contact-address" placeholder="Enter address" @bind:event="oninput" @bind="contact.Address">
+
+      <small id="contact-address" class="form-text text-muted">
+        <ValidationMessage For="@(() => contact.Address)" />
+      </small>
+    </div>
+
+    @* Message *@
+    <div class="form-group required">
+      <label for="msg">Message</label>
+      <textarea class="form-control" id="msg" aria-describedby="message" placeholder="Enter message" rows="7" @bind:event="oninput" @bind="contact.Message"></textarea>
+
+      <small id="message" class="form-text text-muted">
+        <ValidationMessage For="@(() => contact.Message)" />
+      </small>
+    </div>
+
+    @* Selected service *@
+    <div class="form-group required">
+      <label for="selectService">Select service</label>
+      <select class="form-control" name="selectService" id="selectService" @bind="contact.SelectedService">
+        <option value="">-- Select a service --</option>
+        <option value="a">A</option>
+        <option value="b">B</option>
+        <option value="c">C</option>
+      </select>
+
+      <small id="selected-service" class="form-text text-muted">
+        <ValidationMessage For="@(() => contact.SelectedService)" />
+      </small>
+    </div>
+
+    @* Policy agreement *@
+    <div class="form-group form-check required">
+      <input type="checkbox" class="form-check-input" id="policyAgreement" @bind="contact.AgreeToPolicy">
+      <label class="form-check-label" for="policyAgreement">I agree to the policy</label>
+
+      <small id="policy-agreement" class="form-text text-muted">
+        <ValidationMessage For="@(() => contact.AgreeToPolicy)" />
+      </small>
+    </div>
+  </div>
+
+  <div class="w-100 mt-2"></div>
+  <hr>
+  <button type="submit" class="btn btn-primary mt-1 w-100">Submit</button>
+</EditForm>
+
+@if (isSubmitted) {
+  <div class="d-flex flex-column gap-2">
+    <hr>
+
+    <h2>Submitted data:</h2>
+    <p><strong>Full name:</strong> @contact.FullName</p>
+    <p><strong>Email:</strong> @contact.Email</p>
+    <p><strong>Phone number:</strong> @contact.Phone</p>
+    <p><strong>Address:</strong> @contact.Address</p>
+    <p><strong>Message:</strong> @contact.Message</p>
+    <p><strong>Selected service:</strong> @contact.SelectedService</p>
+
+  </div>
+}
+
+@code {
+  class ContactModel {
+    @* fullname - at least 3 characters long *@
+    [Required(ErrorMessage = "Full name is required")]
+    [MinLength(3, ErrorMessage = "Full name must be at least 3 characters long")]
+    public string FullName { get; set; } = "";
+
+    @* email - valid *@
+    [Required(ErrorMessage = "Email is required")]
+    [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format")]
+    public string Email { get; set; } = "";
+
+    @* phoneNumber - must be 10 - 12 digits *@
+    [Required(ErrorMessage = "Phone is required")]
+    [MaxLength(12, ErrorMessage = "Phone must be 10 - 12 digits")]
+    [MinLength(10, ErrorMessage = "Phone must be 10 - 12 digits")]
+    public string Phone { get; set; } = "";
+
+    @* address - no validation *@
+    public string Address { get; set; } = "";
+
+    @* message - no blank, at least 10 characters long *@
+    [Required(ErrorMessage = "Message is required")]
+    [MinLength(10, ErrorMessage = "Message must be at least 10 characters long")]
+    public string Message { get; set; } = "";
+
+    @* dropdown - select service - no blank, must choose one *@
+    [Required(ErrorMessage = "Please select a service")]
+    public string SelectedService { get; set; } = "";
+
+    @* policy agreement - checkbox - must agree *@
+    [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree to the policy")]
+    public bool AgreeToPolicy { get; set; } = false;
+  }
+
+  ContactModel contact = new ContactModel();
+
+  bool isSubmitted = false;
+
+  void HandleValidSubmit()
+  {
+    // form is valid — handle submission here (e.g. send to API)
+    Console.WriteLine("Form submitted successfully.");
+
+    isSubmitted = true;
+  }
+
+  void HandleInvalidSubmit()
+  {
+    // form has validation errors
+    Console.WriteLine("Form has errors.");
+
+    isSubmitted = false;
+  }
+
+}
