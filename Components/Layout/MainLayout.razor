@@ -1,5 +1,9 @@
 ﻿@inherits LayoutComponentBase
 
+@inject CartService _cartService
+
+@implements IDisposable
+
 <div class="page">
     <div class="custom-sidebar">
         <CustomNavMenu />
@@ -7,6 +11,8 @@
 
     <main>
         <div class="top-row px-4">
+
+            Cart: @totalQuantity() -  @totalPrice().ToString("N0") VND
         </div>
 
         <article class="content px-4">
@@ -14,3 +20,25 @@
         </article>
     </main>
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        _cartService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        _cartService.OnChange -= StateHasChanged;
+    }
+
+    decimal totalPrice()
+    {
+        return _cartService.ToTalPrice();
+    }
+
+    int totalQuantity()
+    {
+        return _cartService.TotalQuantity();
+    }
+}

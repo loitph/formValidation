@@ -1,0 +1,209 @@
+@page "/burger"
+
+@implements IDisposable
+
+@inject BurgerService _burgerService
+
+<h1>Burger</h1>
+
+<div class="flex gap-2">
+    <button class="btn btn-dark" @onclick=@(() => AddTopping("salad"))>Add Salad</button>
+    <button class="btn btn-dark" @onclick=@(() => AddTopping("beef"))>Add Beef</button>
+    <button class="btn btn-dark" @onclick=@(() => AddTopping("cheese"))>Add Cheese</button>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+
+            <div class="breadTop"></div>
+            <!--salad -->
+            @for (int i = 0; i < listSalad(); i++)
+            {
+                <div class="salad"></div>
+            }
+
+            @for (int i = 0; i < listBeef(); i++)
+            {
+                <div class="beef"></div>
+            }
+
+            @for (int i = 0; i < listCheese(); i++)
+            {
+                <div class="cheese"></div>
+            }
+
+            <div class="breadBottom"></div>
+        </div>
+        <div class="col-md-6">
+            <h3 class="menu">Menu</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                  @if (@getSaladQuantity() > 0) {
+                    <tr>
+                      <td>Salad</td>
+                      <td>500</td>
+                      <td>
+                          <button class="btn btn-success me-2" @onclick="() => updateSalad(1)">+</button>
+                          @getSaladQuantity()
+                          <button class="btn btn-success ms-2" @onclick="() => updateSalad(-1)">-</button>
+                      </td>
+                      <td>@getTotalSaladPrice()</td>
+                      <td>
+                          <button class="btn btn-danger">
+                              <i class="fa fa-trash" @onclick=@(() => deleteTopping("salad"))></i>
+                          </button>
+                      </td>
+                    </tr>
+                  }
+
+                  @if (@getBeefQuantity() > 0) {
+
+                    <tr>
+                      <td>Beef</td>
+                      <td>1000</td>
+                      <td>
+                          <button class="btn btn-success me-2" @onclick="() => updateBeef(1)">+</button>
+                          @getBeefQuantity()
+                          <button class="btn btn-success ms-2" @onclick="() => updateBeef(-1)">-</button>
+                      </td>
+                      <td>@getTotalBeefPrice()</td>
+                      <td>
+                          <button class="btn btn-danger">
+                              <i class="fa fa-trash" @onclick=@(() => deleteTopping("beef"))></i>
+                          </button>
+                      </td>
+                    </tr>
+                  }
+
+                  @if (@getCheeseQuantity() > 0) {
+                    <tr>
+                      <td>Cheese</td>
+                      <td>800</td>
+                      <td>
+                          <button class="btn btn-success me-2" @onclick="() => updateCheese(1)">+</button>
+                          @getCheeseQuantity()
+                          <button class="btn btn-success ms-2" @onclick="() => updateCheese(-1)">-</button>
+                      </td>
+                      <td>@getTotalCheesePrice()</td>
+                      <td>
+                          <button class="btn btn-danger">
+                              <i class="fa fa-trash" @onclick=@(() => deleteTopping("cheese"))></i>
+                          </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td class="fw-bold">total</td>
+                        <td class="fw-bold">@(@getTotalSaladPrice() + @getTotalBeefPrice() + @getTotalCheesePrice())</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+  protected override async Task OnInitializedAsync()
+  {
+    _burgerService.OnChange += StateHasChanged;
+  }
+
+  public void Dispose()
+  {
+    _burgerService.OnChange -= StateHasChanged;
+  }
+
+  public int listSalad() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "salad")?.Quantity ?? 0;
+
+    return count;
+  }
+
+  public int listBeef() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "beef")?.Quantity ?? 0;
+
+    return count;
+  }
+
+  public int listCheese() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "cheese")?.Quantity ?? 0;
+
+    return count;
+  }
+
+  public async Task updateTopping(string id, int quantity) {
+    await _burgerService.UpdateTopping(id, quantity);
+  }
+
+  public async Task updateSalad(int quantity) {
+    await _burgerService.UpdateTopping("salad", quantity);
+  }
+
+  public decimal getTotalSaladPrice() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "salad")?.Quantity ?? 0;
+
+    return count * 500;
+  }
+
+  public int getSaladQuantity() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "salad")?.Quantity ?? 0;
+
+    return count;
+  }
+
+  public async Task updateBeef(int quantity) {
+    await _burgerService.UpdateTopping("beef", quantity);
+  }
+
+  public decimal getTotalBeefPrice() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "beef")?.Quantity ?? 0;
+
+    return count * 1000;
+  }
+
+  public int getBeefQuantity() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "beef")?.Quantity ?? 0;
+
+    return count;
+  }
+
+  public async Task updateCheese(int quantity) {
+    await _burgerService.UpdateTopping("cheese", quantity);
+  }
+
+  public decimal getTotalCheesePrice() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "cheese")?.Quantity ?? 0;
+
+    return count * 800;
+  }
+
+  public int getCheeseQuantity() {
+    int count = _burgerService.listTopping.SingleOrDefault(x => x.Id == "cheese")?.Quantity ?? 0;
+
+    return count;
+  }
+
+  public async Task deleteTopping(string id) {
+    await _burgerService.RemoveTopping(id);
+  }
+
+  public async Task AddTopping(string id) {
+    await _burgerService.AddTopping(id);
+  }
+}

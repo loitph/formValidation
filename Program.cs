@@ -1,3 +1,4 @@
+using Buoi24.Services;
 using Microsoft.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,8 @@ builder.Services.AddScoped<HttpClient>(sp =>
     };
 });
 
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<BurgerService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
